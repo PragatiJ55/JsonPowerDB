@@ -6,19 +6,50 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>JsonPowerDB_project</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet"
-              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script
         src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script
         src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
         <script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+
+        <style> 
+            .slide{
+                margin-top: 50px;
+                background-color:#20346D ;
+                padding: 8px;
+                text-align: center;
+                border:solid 1px #c3c3c3;
+                width: 70%;
+                color: white;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .panel {
+
+                text-align: center;
+                background-color: #6F91F1;
+                border:solid 1px #c3c3c3;
+                width: 70%;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 50px;
+                display: none;
+
+            }
+
+
+        </style>
+
     </head>
     <body>
-        <div class="container">
+      
+             <div>
+            <div class="slide">Create Employee Record</div>
+            <div class="panel">
             <h2>Vertical (basic) form</h2>
             <form id="empForm" method="post">
                 <div class="form-group">
@@ -41,7 +72,79 @@ and open the template in the editor.
                        onclick="saveEmployee();">
             </form>
         </div>
+             </div>
+        <div>
+            <div class="slide">Get employee information</div>
+            <div class="panel">
+                <form id="getEmpInfoForm" method="post">
+                    <div class="form-group">
+                        <span><label for="empId">Employee ID:</label> <label id="empIdMsgGet">
+                            </label></span>
+                        <input type="text" class="form-control" name="empId" id="empIdGet"
+                               placeholder="Enter Employee's ID" required>
+                        <input type="button" class="btn btn-primary" style='margin: 20px' id="empGet" value="Get info"
+                               onclick="getEmployee();">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="slide">Remove an employee</div>
+            <div class="panel">
+                <form id="delEmpInfoForm" method="post">
+                    <div class="form-group">
+                        <span><label for="empRecord">Record no.</label> <label id="empIdMsgDel">
+                            </label></span>
+                        <input type="text" class="form-control" name="empRecord" id="empDel"
+                               placeholder="Enter Record number" required>
+                        <input type="button" class="btn btn-primary" style='margin: 20px' id="empDel" value="Remove Record"
+                               onclick="delEmployee();">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="slide">Update Employee Record</div>
+            <div class="panel">
+                <form id="updEmpInfoForm" method="post">
+                    <div class="form-group">
+                        <span><label for="empRecord">Record no.</label> <label id="empIdMsgDel">
+                            </label></span>
+                        <input type="text" class="form-control" name="empRecord" id="empUpd"
+                               placeholder="Enter Record number" required>
+                    </div>
+                    <div class="form-group">
+                        <span><label for="empId">Employee ID:</label> <label id="empIdMsg">
+                            </label></span>
+                        <input type="text" class="form-control" name="empId" id="empIdUpd"
+                               placeholder="Enter Employee ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="empName">Employee Name:</label>
+                        <input type="text" class="form-control" id="empNameUpd"
+                               placeholder="Enter Employee Name" name="empName">
+                    </div>
+                    <div class="form-group">
+                        <label for="empEmail">Email:</label>
+                        <input type="email" class="form-control" id="empEmailUpd"
+                               placeholder="Enter Employee Email" name="empEmail">
+                    </div>
+                    <input type="button" class="btn btn-primary" style='margin: 20px' id="empUpd" value="Update employee record"
+                           onclick="updateEmployee();">
+                    </div>
+                </form>
+            </div>
+        </div>
         <script>
+            $(document).ready(function () {
+                $(".slide").click(function () {
+                    $(this).next(".panel").slideToggle("slow");
+                });
+            });
+            //Create
+
             function validateAndGetFormData() {
                 var empIdVar = $("#empId").val();
                 if (empIdVar === "") {
@@ -89,6 +192,121 @@ and open the template in the editor.
                         "http://api.login2explore.com:5577", "/api/iml");
                 alert(JSON.stringify(resultObj));
                 jQuery.ajaxSetup({async: true});
+                resetForm();
+
+            }
+
+
+
+            //Read
+            function validateIdForm() {
+                var empIdVar = $("#empIdGet").val();
+                if (empIdVar === "") {
+                    alert("Employee ID Required Value");
+                    $("#empIdGet").focus();
+                    return "";
+                }
+                var jsonStrObj = {
+                    empId: empIdVar,
+                };
+                return JSON.stringify(jsonStrObj);
+            }
+
+
+
+            function getEmployee() {
+                var jsonStr = validateIdForm();
+                if (jsonStr === "") {
+                    return;
+                }
+                var getReqStr = createGETRequest("90937109|-31948801083075639|90931675", "SAMPLE",
+                        "EMP-REL", jsonStr);
+                alert(getReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommandAtGivenBaseUrl(getReqStr,
+                        "http://api.login2explore.com:5577", "/api/irl");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+
+            }
+
+            //Remove
+
+            function validateRecord() {
+                var empDel = $("#empDel").val();
+                if (empDel === "") {
+                    alert("Record number Required Value");
+                    $("#empDel").focus();
+                    return "";
+                }
+                return empDel;
+            }
+
+
+
+            function delEmployee() {
+                var reqId = validateRecord();
+                if (reqId === "") {
+                    return;
+                }
+                var getReqStr = createREMOVERecordRequest("90937109|-31948801083075639|90931675", "SAMPLE",
+                        "EMP-REL", reqId);
+                alert(getReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommandAtGivenBaseUrl(getReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+
+            }
+
+            //update
+
+            function getUpdateFormData() {
+                var empIdVar = $("#empIdUpd").val();
+                var empNameVar = $("#empNameUpd").val();
+                var empEmailVar = $("#empEmailUpd").val();
+
+                console.log(empNameVar);
+                var jsonStrObj = {
+                };
+                if (empIdVar != "") {
+                    jsonStrObj.empId = empIdVar;
+                }
+                if (empNameVar != "") {
+                    jsonStrObj.empName = empNameVar;
+                }
+                if (empEmailVar != "") {
+                    jsonStrObj.empEmail = empEmailVar;
+                }
+
+                return JSON.stringify(jsonStrObj);
+            }
+            function validateRecord() {
+                var empUpd = $("#empUpd").val();
+                if (empUpd === "") {
+                    alert("Record number Required Value");
+                    $("#empUpd").focus();
+                    return "";
+                }
+                return empUpd;
+            }
+
+            function updateEmployee() {
+                var jsonStr = getUpdateFormData();
+                var reqId = validateRecord();
+                if (jsonStr === "" || reqId === "") {
+                    return;
+                }
+                var putReqStr = createUPDATERecordRequest("90937109|-31948801083075639|90931675",
+                        jsonStr, "SAMPLE", "EMP-REL", reqId);
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommandAtGivenBaseUrl(putReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+                resetForm();
 
             }
         </script>
